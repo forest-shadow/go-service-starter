@@ -45,6 +45,17 @@ tasks:
           GOBIN={{.TOOLS_DIR}} go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@{{.GOLANGCI_LINT_VERSION}}
         fi
 
+  dev:build:
+    desc: "🛠️ Compile Application"
+    cmds:
+      - go build -o {{.BIN_DIR}}/{{.APP_NAME}} ./cmd
+
+  dev:run:
+    desc: "🚀 Run Application"
+    deps: [dev:install:deps]
+    cmds:
+      - '{{.TOOLS_DIR}}/air --build.cmd "go build -o {{.BIN_DIR}}/{{.APP_NAME}} ./cmd" --build.bin "{{.BIN_DIR}}/{{.APP_NAME}}"'
+
   dev:clean:deps:
     desc: "🗑️ Delete dev deps binaries"
     cmds:
