@@ -44,7 +44,7 @@ jobs:
           if [ -n "$modules_from_vars" ] && [ "$modules_from_vars" != "null" ]; then
             echo "MODULES=$modules_from_vars" >> "$GITHUB_OUTPUT"
           else
-            modules_scan=$(find . -name 'go.mod' -not -path './.*' -exec dirname {} \; | sort -u | jq -R -s -c 'split("\n")[:-1]')
+            modules_scan=$(find . -name 'go.mod' -not -path './.*' -exec dirname {} \; | sort -u | sed 's|^\.$|.|' | jq -R -s -c 'split("\n") | map(select(length > 0))')
             echo "MODULES=$modules_scan" >> "$GITHUB_OUTPUT"
           fi
 
