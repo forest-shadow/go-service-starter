@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  extract-vars:
+    name: Extract Variables from Taskfile
+    runs-on: ubuntu-latest # GitHub Runner VM image
+    outputs:
+      go-version: ${{ steps.extract.outputs.GO_VERSION }}
+      golangci-lint-version: ${{ steps.extract.outputs.GOLANGCI_LINT_VERSION }}
+      modules: ${{ steps.extract.outputs.MODULES }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Extract variables from Taskfile
+        id: extract
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -f Taskfile.yml ]; then
+            echo "Taskfile.yml not found" >&2
+            exit 1
+          fi
+
+          # Emit all .vars entries as step outputs
+          yq -o=json '.vars' Taskfile.yml \
+            | jq -r 'to_entries[] | "\(.key)=\(.value)"' \
+            | while IFS= read -r kv; do echo "$kv" >> "$GITHUB_OUTPUT"; done
+
+          # MODULES: prefer .vars.MODULES if present, else scan repo for go.mod
+          modules_from_vars=$(yq -r '.vars.MODULES // ""' Taskfile.yml)
+          if [ -n "$modules_from_vars" ] && [ "$modules_from_vars" != "null" ]; then
+            echo "MODULES=$modules_from_vars" >> "$GITHUB_OUTPUT"
+          else
+            modules_scan=$(find . -name 'go.mod' -not -path './.*' -exec dirname {} \; | sort -u | jq -R -s -c 'split("\n")[:-1]')
+            echo "MODULES=$modules_scan" >> "$GITHUB_OUTPUT"
+          fi
+
+  debug-vars:
+    name: Debug extracted variables
+    needs: extract-vars
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show all extracted variables
+        run: |
+          echo "=== Extracted Variables ==="
+          echo "GO_VERSION: ${{ needs.extract-vars.outputs.go-version }}"
+          echo "GOLANGCI_LINT_VERSION: ${{ needs.extract-vars.outputs.golangci-lint-version }}"
+          echo "MODULES: ${{ needs.extract-vars.outputs.modules }}"
+          echo "AIR_VERSION: ${{ needs.extract-vars.outputs.AIR_VERSION }}"
+          echo "BUF_VERSION: ${{ needs.extract-vars.outputs.BUF_VERSION }}"
+          echo "GOOSE_VERSION: ${{ needs.extract-vars.outputs.GOOSE_VERSION }}"
+          echo "LEFTHOOK_VERSION: ${{ needs.extract-vars.outputs.LEFTHOOK_VERSION }}"
+          echo "APP_NAME: ${{ needs.extract-vars.outputs.APP_NAME }}"
+          echo "BIN_DIR: ${{ needs.extract-vars.outputs.BIN_DIR }}"
+          echo "TOOLS_DIR: ${{ needs.extract-vars.outputs.TOOLS_DIR }}"
+
+  # lint:
+  #   needs: extract-vars
+  #   uses: ./.github/workflows/lint-reusable.yml
+  #   with:
+  #     modules: ${{ needs.extract-vars.outputs.modules }}
+  #     go-version: ${{ needs.extract-vars.outputs.go-version }}
+  #     golangci-lint-version: ${{ needs.extract-vars.outputs.golangci-lint-version }}
