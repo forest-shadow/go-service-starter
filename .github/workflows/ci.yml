@@ -12,6 +12,13 @@ jobs:
       go-version: ${{ steps.extract.outputs.GO_VERSION }}
       golangci-lint-version: ${{ steps.extract.outputs.GOLANGCI_LINT_VERSION }}
       modules: ${{ steps.extract.outputs.MODULES }}
+      air-version: ${{ steps.extract.outputs.AIR_VERSION }}
+      buf-version: ${{ steps.extract.outputs.BUF_VERSION }}
+      goose-version: ${{ steps.extract.outputs.GOOSE_VERSION }}
+      lefthook-version: ${{ steps.extract.outputs.LEFTHOOK_VERSION }}
+      app-name: ${{ steps.extract.outputs.APP_NAME }}
+      bin-dir: ${{ steps.extract.outputs.BIN_DIR }}
+      tools-dir: ${{ steps.extract.outputs.TOOLS_DIR }}
 
     steps:
       - name: Checkout code
@@ -52,13 +59,13 @@ jobs:
           echo "GO_VERSION: ${{ needs.extract-vars.outputs.go-version }}"
           echo "GOLANGCI_LINT_VERSION: ${{ needs.extract-vars.outputs.golangci-lint-version }}"
           echo "MODULES: ${{ needs.extract-vars.outputs.modules }}"
-          echo "AIR_VERSION: ${{ needs.extract-vars.outputs.AIR_VERSION }}"
-          echo "BUF_VERSION: ${{ needs.extract-vars.outputs.BUF_VERSION }}"
-          echo "GOOSE_VERSION: ${{ needs.extract-vars.outputs.GOOSE_VERSION }}"
-          echo "LEFTHOOK_VERSION: ${{ needs.extract-vars.outputs.LEFTHOOK_VERSION }}"
-          echo "APP_NAME: ${{ needs.extract-vars.outputs.APP_NAME }}"
-          echo "BIN_DIR: ${{ needs.extract-vars.outputs.BIN_DIR }}"
-          echo "TOOLS_DIR: ${{ needs.extract-vars.outputs.TOOLS_DIR }}"
+          echo "AIR_VERSION: ${{ needs.extract-vars.outputs.air-version }}"
+          echo "BUF_VERSION: ${{ needs.extract-vars.outputs.buf-version }}"
+          echo "GOOSE_VERSION: ${{ needs.extract-vars.outputs.goose-version }}"
+          echo "LEFTHOOK_VERSION: ${{ needs.extract-vars.outputs.lefthook-version }}"
+          echo "APP_NAME: ${{ needs.extract-vars.outputs.app-name }}"
+          echo "BIN_DIR: ${{ needs.extract-vars.outputs.bin-dir }}"
+          echo "TOOLS_DIR: ${{ needs.extract-vars.outputs.tools-dir }}"
 
   # lint:
   #   needs: extract-vars
