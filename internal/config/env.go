@@ -20,3 +20,7 @@ func (e Environment) IsProduction() bool {
 func (e Environment) IsDevelopment() bool {
 	return e == EnvLocal || e == EnvDev
 }
+
+func (e Environment) IsValid() bool {
+	return e == EnvLocal || e == EnvDev || e == EnvStage || e == EnvProd
+}

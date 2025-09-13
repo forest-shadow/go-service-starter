@@ -35,4 +35,9 @@ Thumbs.db
 
 # Temporary files
 *.tmp
-*.temp 
+*.temp
+./logs/
+
+# Config files with sensitive data
+configs/env.*.yaml
+!configs/env.example.yaml
